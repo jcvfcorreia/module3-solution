@@ -22,49 +22,67 @@ function FoundItemsDirective() {
 }
 
 function FoundItemsDirectiveController() {
-  var list = this;
+  var viewList = this;
 
-  /*list.cookiesInList = function () {
-    for (var i = 0; i < list.items.length; i++) {
-      var name = list.items[i].name;
-      if (name.toLowerCase().indexOf("cookie") !== -1) {
-        return true;
-      }
+  viewList.foundItems = function () {
+    if (viewList.items === undefined || viewList.items.length === 0 ){
+      return true;
     }
-
     return false;
-  };*/
+  };
 }
 
 NarrowItDownController.$inject = ['MenuSearchService'];
 function NarrowItDownController(MenuSearchService){
   var viewList = this;
+  var list = [];
+  var foundItems = [];
 
   viewList.getItems = function(searchTerm){
-      var promise = MenuSearchService.getMatchedMenuItems();
-
-      promise.then(function (response) {
-        //viewList.items = response.data;
-        console.log(response);
-        viewList.items = response.data;
-      })
-      .catch(function (error) {
-        console.log(error);
-      })
+    viewList.items = [];
+    viewList.items = MenuSearchService.getMatchedMenuItems(searchTerm);
   }
+
+  viewList.removeItem = function(index){
+      MenuSearchService.removeItem(index);
+  }
+
 }
 
 MenuSearchService.$inject = ['$http']
 function MenuSearchService($http){
   var service = this;
-
-  service.getMatchedMenuItems = function(){
+  var list = [];
+  var foundItems = [];
+  service.getMatchedMenuItems = function(searchTerm){
+    foundItems = [];
     var response = $http({
-    method: "GET",
-    url: ("http://davids-restaurant.herokuapp.com/categories.json")
-  });
+      method: "GET",
+      url: ("https://davids-restaurant.herokuapp.com/menu_items.json")
+    }).then(function (response) {
+      console.log(response);
+      list = response.data.menu_items;
 
-  return response;
+      for (var i = 0; i < list.length;i++){
+
+        if (searchTerm !== undefined && searchTerm !== ''){
+          console.log(list[i].description);
+          if (list[i].description.indexOf(searchTerm) !== -1){
+            console.log('push');
+            foundItems.push(list[i]);
+          }
+        }
+      }
+
+    })
+    .catch(function (error) {
+      console.log(error);
+    })
+    return foundItems;
   }
+
+  service.removeItem = function (itemIndex) {
+      foundItems.splice(itemIndex,1);
+  };
 }
 })();

@@ -16,14 +16,14 @@
       <input type="text" placeholder="search term" class="form-control" ng-model="list.searchTerm">
     </div>
     <div class="form-group narrow-button">
-      <button class="btn btn-primary" ng-click="list.getItems()">Narrow It Down For Me!</button>
+      <button class="btn btn-primary" ng-click="list.getItems(list.searchTerm)">Narrow It Down For Me!</button>
     </div>
 
     <!-- Bonus loader (see Bonus section of the assignment) -->
     <!--items-loader-indicator></items-loader-indicator>--
 
     <!-- found-items should be implemented as a component -->
-    <found-items items="list.items""></found-items>
+    <found-items id="foundItems" items="list.items" on-remove="list.removeItem(index)"></found-items>
   </div>
 
 </body>
